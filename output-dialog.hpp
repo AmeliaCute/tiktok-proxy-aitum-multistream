@@ -25,6 +25,7 @@ private:
 	QWidget *WizardInfoTwitch(bool edit = false);
 	QWidget *WizardInfoTrovo(bool edit = false);
 	QWidget *WizardInfoTikTok(bool edit = false);
+	QWidget *WizardInfoTikTokStreamlabs(bool edit = false);
 	QWidget *WizardInfoFacebook(bool edit = false);
 
 	// Platform icons
@@ -63,4 +64,5 @@ public:
 	QString outputName;
 	QString outputServer;
 	QString outputKey;
+	QString streamlabsToken;
 };

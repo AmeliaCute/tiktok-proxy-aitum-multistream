@@ -2,6 +2,9 @@
 #include "multistream.hpp"
 #include "obs-module.h"
 #include "version.h"
+#include "tiktok-setup-dialog.hpp"
+#include "tiktok-streamlabs.hpp"
+#include <thread>
 #include <obs-frontend-api.h>
 #include <QDesktopServices>
 #include <QGroupBox>
@@ -711,8 +714,26 @@ void MultistreamDock::LoadOutput(obs_data_t *output_data, bool vertical)
 	} else {
 		connect(streamButton, &QPushButton::clicked, [this, streamButton, output_data] {
 			if (streamButton->isChecked()) {
-				blog(LOG_INFO, "[Aitum Multistream] start stream clicked '%s'",
-				     obs_data_get_string(output_data, "name"));
+				blog(LOG_INFO, "[Aitum Multistream] start stream clicked '%s'", obs_data_get_string(output_data, "name"));
+
+				const char *slToken = obs_data_get_string(output_data, "streamlabs_token");
+				if (slToken && strlen(slToken) > 0) 
+				{
+					auto *dlg = new TikTokSetupDialog(std::string(slToken), static_cast<QWidget *>(obs_frontend_get_main_window()));
+
+					if (dlg->exec() != QDialog::Accepted) 
+					{
+						streamButton->setChecked(false);
+						outputButtonStyle(streamButton);
+						dlg->deleteLater();
+						return;
+					}
+
+					obs_data_set_string(output_data, "stream_server", dlg->streamServer.c_str());
+					obs_data_set_string(output_data, "stream_key", dlg->streamKey.c_str());
+					dlg->deleteLater();
+				}
+
 				if (!StartOutput(output_data, streamButton))
 					streamButton->setChecked(false);
 			} else {
@@ -731,14 +752,20 @@ void MultistreamDock::LoadOutput(obs_data_t *output_data, bool vertical)
 					blog(LOG_INFO, "[Aitum Multistream] stop stream clicked '%s'",
 					     obs_data_get_string(output_data, "name"));
 					const char *name2 = obs_data_get_string(output_data, "name");
-					for (auto it = outputs.begin(); it != outputs.end(); it++) {
+
+					const char *slToken = obs_data_get_string(output_data, "streamlabs_token");
+					if (slToken && strlen(slToken) > 0) 
+					{
+						std::string tok(slToken);
+						std::thread([tok] { TikTokStreamlabs::endStream(tok); }).detach();
+					}
+
+					for (auto it = outputs.begin(); it != outputs.end(); it++) 
+					{
 						if (std::get<std::string>(*it) != name2)
 							continue;
 
-						obs_queue_task(
-							OBS_TASK_GRAPHICS,
-							[](void *param) { obs_output_stop((obs_output_t *)param); },
-							std::get<obs_output *>(*it), false);
+						obs_queue_task(OBS_TASK_GRAPHICS, [](void *param) { obs_output_stop((obs_output_t *)param); }, std::get<obs_output *>(*it), false);
 					}
 				} else {
 					streamButton->setChecked(true);

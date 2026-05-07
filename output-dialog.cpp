@@ -309,6 +309,7 @@ OutputDialog::OutputDialog(QDialog *parent, QStringList _otherNames) : QDialog(p
 	stackedWidget->addWidget(WizardInfoTrovo());
 	stackedWidget->addWidget(WizardInfoTikTok());
 	stackedWidget->addWidget(WizardInfoFacebook());
+	stackedWidget->addWidget(WizardInfoTikTokStreamlabs());
 
 	stackedWidget->setCurrentIndex(0);
 
@@ -424,7 +425,12 @@ QWidget *OutputDialog::WizardServicePage()
 
 	selectionLayout->addLayout(rowTwo);
 
-	//
+	// row 3 
+	auto rowThree = new QHBoxLayout;
+	rowThree->addWidget(selectionButton("TikTok\n(Streamlabs)", platformIconTikTok, 9));
+	rowThree->addStretch(3);
+	selectionLayout->addLayout(rowThree);
+
 	pageLayout->addLayout(selectionLayout);
 	page->setLayout(pageLayout);
 
@@ -996,6 +1002,84 @@ QWidget *OutputDialog::WizardInfoTikTok(bool edit)
 					outputName = outputNameField->text();
 					outputServer = serverSelection->text();
 					outputKey = outputKeyField->text();
+					validateOutputs(confirmButton);
+				}
+			});
+	}
+
+	return page;
+}
+
+QWidget *OutputDialog::WizardInfoTikTokStreamlabs(bool edit)
+{
+	auto page = new QWidget(this);
+	page->setStyleSheet("padding: 0px; margin: 0px;");
+
+	auto pageLayout = new QVBoxLayout;
+	pageLayout->setSpacing(12);
+
+	// Heading
+	auto titleLabel = new QLabel(QString::fromUtf8(obs_module_text(edit ? "TikTokSLServiceInfoEdit" : "TikTokSLServiceInfo")));
+	titleLabel->setWordWrap(true);
+	titleLabel->setTextFormat(Qt::RichText);
+	pageLayout->addWidget(titleLabel);
+
+	auto contentLayout = new QVBoxLayout;
+	auto confirmButton = generateButton(QString(obs_module_text(edit ? "SaveOutput" : "CreateOutput")));
+
+	auto formLayout = new QFormLayout;
+	formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+	formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignTrailing | Qt::AlignVCenter);
+	formLayout->setSpacing(12);
+
+	// Output name
+	auto outputNameField = generateOutputNameField("TikTokSLOutput", confirmButton, edit);
+	formLayout->addRow(generateFormLabel("OutputName"), outputNameField);
+
+	// Streamlabs token field
+	auto tokenField = new StreamKeyInput;
+	tokenField->setStyleSheet("padding: 4px 8px;");
+	tokenField->setPlaceholderText("Paste your Streamlabs API token here…");
+	if (edit && !streamlabsToken.isEmpty()) tokenField->setText(streamlabsToken);
+	tokenField->setEchoMode(StreamKeyInput::EchoMode::Password);
+	connect(tokenField, &StreamKeyInput::focusGained, [tokenField] { tokenField->setEchoMode(StreamKeyInput::EchoMode::Normal); });
+	connect(tokenField, &StreamKeyInput::focusLost, [tokenField] { tokenField->setEchoMode(StreamKeyInput::EchoMode::Password); });
+	connect(tokenField, &QLineEdit::textEdited, [this, tokenField, confirmButton] 
+	{
+		streamlabsToken = tokenField->text();
+		
+		// server + key are filled at stream-start time; 
+		// mark output valid as long as name + token are set (server/key will be placeholder).
+		outputServer = streamlabsToken.isEmpty() ? "" : "streamlabs://tiktok";
+		outputKey = streamlabsToken.isEmpty() ? "" : "pending";
+		validateOutputs(confirmButton);
+	});
+
+	formLayout->addRow(generateFormLabel("TikTokSLToken"), tokenField);
+	formLayout->addWidget(generateInfoLabel("TikTokSLTokenInfo"));
+
+	contentLayout->addLayout(formLayout);
+	auto spacer = new QSpacerItem(1, 20, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+	contentLayout->addSpacerItem(spacer);
+	pageLayout->addLayout(contentLayout);
+
+	auto serviceButton = edit ? nullptr : generateBackButton();
+	auto controlsLayout = generateWizardButtonLayout(confirmButton, serviceButton, edit);
+	connect(confirmButton, &QPushButton::clicked, [this] { acceptOutputs(); });
+	pageLayout->addLayout(controlsLayout, 1);
+	page->setLayout(pageLayout);
+
+	if (!edit) 
+	{
+		connect(stackedWidget, &QStackedWidget::currentChanged,
+			[this, outputNameField, tokenField, confirmButton] 
+			{
+				if (stackedWidget->currentIndex() == 9) 
+				{ 
+					outputName = outputNameField->text();
+					streamlabsToken = tokenField->text();
+					outputServer = streamlabsToken.isEmpty() ? "" : "streamlabs://tiktok";
+					outputKey = streamlabsToken.isEmpty() ? "" : "pending";
 					validateOutputs(confirmButton);
 				}
 			});

@@ -70,6 +70,41 @@ runs:
 
         .github/scripts/build-linux ${build_args}
 
+    - name: Install Dependencies (Fedora)
+      if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
+      shell: bash
+      run: |
+        : Install system dependencies (Fedora)
+        sudo dnf install -y cmake ninja-build pkg-config clang clang-tools-extra \
+          gcc gcc-c++ curl ccache git zsh rpm-build
+
+        : Install OBS dependencies (Fedora)
+        sudo dnf install -y ffmpeg-free-devel libcurl-devel mbedtls-devel \
+          mesa-libGL-devel jansson-devel luajit-devel python3-devel \
+          libX11-devel libxcb-devel libXcomposite-devel libXinerama-devel \
+          libxcb-devel swig libcmocka-devel libXss-devel libglvnd-devel \
+          mesa-libGLES-devel wayland-devel librist-devel srt-devel \
+          pciutils-devel pipewire-devel qrcodegencpp-devel uthash-devel
+
+        : Install OBS Qt6 dependencies (Fedora)
+        sudo dnf install -y qt6-qtbase-devel qt6-qtbase-private-devel \
+          qt6-qtsvg-devel qt6-qtwayland-devel
+
+    - name: Run Fedora Build
+      if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
+      shell: zsh --no-rcs --errexit --pipefail {0}
+      working-directory: ${{ inputs.workingDirectory }}
+      run: |
+        : Run Fedora Build
+
+        local -a build_args=(
+          --target linux-x86_64
+          --config ${{ inputs.config }}
+        )
+        if (( ${+RUNNER_DEBUG} )) build_args+=(--debug)
+
+        .github/scripts/build-linux ${build_args}
+
     - name: Run Windows Build
       if: runner.os == 'Windows'
       shell: pwsh

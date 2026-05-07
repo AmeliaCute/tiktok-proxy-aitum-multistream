@@ -26,11 +26,11 @@ else()
 endif()
 
 if(BUILD_OUT_OF_TREE)
-  find_qt(COMPONENTS Widgets Core)
+  find_qt(COMPONENTS Widgets Core Concurrent)
 else()
-  find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+  find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent)
 endif()
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets Qt::Concurrent)
 target_compile_options(
 ${PROJECT_NAME} PRIVATE $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-quoted-include-in-framework-header
                                 -Wno-comma>)
@@ -54,6 +54,8 @@ target_sources(${PROJECT_NAME} PRIVATE
   output-dialog.cpp
   stream-key-input.cpp
   multistream.cpp
+  tiktok-streamlabs.cpp
+  tiktok-setup-dialog.cpp
   file-updater.c
 	resources.qrc
 	config-dialog.hpp
@@ -61,6 +63,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	output-dialog.hpp
 	stream-key-input.hpp
     multistream.hpp
+	tiktok-streamlabs.hpp
+	tiktok-setup-dialog.hpp
 	file-updater.h)
 
 if(BUILD_OUT_OF_TREE)

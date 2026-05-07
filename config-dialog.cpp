@@ -249,6 +249,9 @@ OBSBasicSettings::OBSBasicSettings(QMainWindow *parent) : QDialog(parent)
 			obs_data_set_string(s, "name", outputDialog->outputName.toUtf8().constData());
 			obs_data_set_string(s, "stream_server", outputDialog->outputServer.toUtf8().constData());
 			obs_data_set_string(s, "stream_key", outputDialog->outputKey.toUtf8().constData());
+			if (!outputDialog->streamlabsToken.isEmpty())
+				obs_data_set_string(s, "streamlabs_token",
+						    outputDialog->streamlabsToken.toUtf8().constData());
 
 			obs_data_array_push_back(outputs, s);
 			AddServer(mainOutputsLayout, s, outputs);
@@ -339,6 +342,9 @@ OBSBasicSettings::OBSBasicSettings(QMainWindow *parent) : QDialog(parent)
 			obs_data_set_string(s, "name", outputDialog->outputName.toUtf8().constData());
 			obs_data_set_string(s, "stream_server", outputDialog->outputServer.toUtf8().constData());
 			obs_data_set_string(s, "stream_key", outputDialog->outputKey.toUtf8().constData());
+			if (!outputDialog->streamlabsToken.isEmpty())
+				obs_data_set_string(s, "streamlabs_token",
+						    outputDialog->streamlabsToken.toUtf8().constData());
 			obs_data_array_push_back(vertical_outputs, s);
 			AddServer(verticalOutputsLayout, s, vertical_outputs);
 			obs_data_release(s);
@@ -969,6 +975,11 @@ void OBSBasicSettings::AddServer(QFormLayout *outputsLayout, obs_data_t *setting
 			obs_data_set_string(settings, "name", outputDialog->outputName.toUtf8().constData());
 			obs_data_set_string(settings, "stream_server", outputDialog->outputServer.toUtf8().constData());
 			obs_data_set_string(settings, "stream_key", outputDialog->outputKey.toUtf8().constData());
+			if (!outputDialog->streamlabsToken.isEmpty())
+				obs_data_set_string(settings, "streamlabs_token",
+						    outputDialog->streamlabsToken.toUtf8().constData());
+			else
+				obs_data_unset_user_value(settings, "streamlabs_token");
 
 			// Reload
 			LoadSettings(main_settings);

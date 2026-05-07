@@ -99,6 +99,29 @@ runs:
 
         .github/scripts/package-linux ${package_args}
 
+    - name: Install Dependencies (Fedora)
+      if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
+      shell: bash
+      run: |
+        : Install Dependencies (Fedora)
+        sudo dnf install -y zsh rpm-build
+
+    - name: Run Fedora Packaging
+      if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
+      shell: zsh --no-rcs --errexit --pipefail {0}
+      working-directory: ${{ inputs.workingDirectory }}
+      run: |
+        : Run Fedora Packaging
+        package_args=(
+          --target linux-x86_64
+          --config ${{ inputs.config }}
+        )
+        if (( ${+RUNNER_DEBUG} )) build_args+=(--debug)
+
+        if [[ '${{ inputs.package }}' == 'true' ]] package_args+=(--package)
+
+        .github/scripts/package-linux ${package_args}
+
     - name: Run Windows Packaging
       if: runner.os == 'Windows'
       shell: pwsh
