@@ -74,12 +74,13 @@ runs:
         sudo dnf install -y cmake ninja-build pkg-config clang clang-tools-extra \
           gcc gcc-c++ curl ccache git zsh rpm-build jq
 
-        sudo dnf install -y ffmpeg-free-devel libcurl-devel mbedtls-devel \
+        sudo dnf install -y --skip-unavailable \
+          ffmpeg-free-devel libcurl-devel mbedtls-devel \
           mesa-libGL-devel jansson-devel luajit-devel python3-devel \
           libX11-devel libxcb-devel libXcomposite-devel libXinerama-devel \
-          libxcb-devel swig libcmocka-devel libXss-devel libglvnd-devel \
+          swig libcmocka-devel libXScrnSaver-devel libglvnd-devel \
           mesa-libGLES-devel wayland-devel librist-devel srt-devel \
-          pciutils-devel pipewire-devel qrcodegencpp-devel uthash-devel
+          pciutils-devel pipewire-devel uthash-devel
 
         sudo dnf install -y qt6-qtbase-devel qt6-qtbase-private-devel \
           qt6-qtsvg-devel qt6-qtwayland-devel
