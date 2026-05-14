@@ -73,7 +73,7 @@ runs:
         .github/scripts/package-macos ${package_args}
 
     - name: Install Dependencies 🛍️
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.target != 'x86_64-fedora'
       shell: bash
       run: |
         : Install Dependencies 🛍️
@@ -84,7 +84,7 @@ runs:
         echo ::endgroup::
 
     - name: Run Ubuntu Packaging
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.target != 'x86_64-fedora'
       shell: zsh --no-rcs --errexit --pipefail {0}
       working-directory: ${{ inputs.workingDirectory }}
       run: |
@@ -104,7 +104,7 @@ runs:
       shell: bash
       run: |
         : Install Dependencies (Fedora)
-        sudo dnf install -y zsh rpm-build
+        sudo dnf install -y zsh rpm-build jq
 
     - name: Run Fedora Packaging
       if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'

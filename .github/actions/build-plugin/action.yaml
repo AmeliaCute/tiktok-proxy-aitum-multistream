@@ -41,7 +41,7 @@ runs:
         .github/scripts/build-macos ${build_args}
 
     - name: Install Dependencies 🛍️
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.target != 'x86_64-fedora'
       shell: bash
       run: |
         sudo apt update
@@ -56,7 +56,7 @@ runs:
         sudo apt install qt6-base-dev qt6-base-private-dev libqt6svg6-dev qt6-wayland qt6-image-formats-plugins
         
     - name: Run Ubuntu Build
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.target != 'x86_64-fedora'
       shell: zsh --no-rcs --errexit --pipefail {0}
       working-directory: ${{ inputs.workingDirectory }}
       run: |
@@ -76,7 +76,7 @@ runs:
       run: |
         : Install system dependencies (Fedora)
         sudo dnf install -y cmake ninja-build pkg-config clang clang-tools-extra \
-          gcc gcc-c++ curl ccache git zsh rpm-build
+          gcc gcc-c++ curl ccache git zsh rpm-build jq
 
         : Install OBS dependencies (Fedora)
         sudo dnf install -y ffmpeg-free-devel libcurl-devel mbedtls-devel \
