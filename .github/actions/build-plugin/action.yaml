@@ -46,13 +46,10 @@ runs:
       run: |
         sudo apt update
       
-        : Install system dependencies 🛍️
         sudo apt install cmake ninja-build pkg-config clang clang-format build-essential curl ccache git zsh
         
-        : Install OBS dependencies 🛍️
         sudo apt install libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libx264-dev libcurl4-openssl-dev libmbedtls-dev libgl1-mesa-dev libjansson-dev libluajit-5.1-dev python3-dev libx11-dev libxcb-randr0-dev libxcb-shm0-dev libxcb-xinerama0-dev libxcb-composite0-dev libxcomposite-dev libxinerama-dev libxcb1-dev libx11-xcb-dev libxcb-xfixes0-dev swig libcmocka-dev libxss-dev libglvnd-dev libgles2-mesa-dev libwayland-dev librist-dev libsrt-openssl-dev libpci-dev libpipewire-0.3-dev libqrcodegencpp-dev uthash-dev
         
-        : Install OBS Qt6 dependencies 🛍️
         sudo apt install qt6-base-dev qt6-base-private-dev libqt6svg6-dev qt6-wayland qt6-image-formats-plugins
         
     - name: Run Ubuntu Build
@@ -74,11 +71,9 @@ runs:
       if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
       shell: bash
       run: |
-        : Install system dependencies (Fedora)
         sudo dnf install -y cmake ninja-build pkg-config clang clang-tools-extra \
           gcc gcc-c++ curl ccache git zsh rpm-build jq
 
-        : Install OBS dependencies (Fedora)
         sudo dnf install -y ffmpeg-free-devel libcurl-devel mbedtls-devel \
           mesa-libGL-devel jansson-devel luajit-devel python3-devel \
           libX11-devel libxcb-devel libXcomposite-devel libXinerama-devel \
@@ -86,7 +81,6 @@ runs:
           mesa-libGLES-devel wayland-devel librist-devel srt-devel \
           pciutils-devel pipewire-devel qrcodegencpp-devel uthash-devel
 
-        : Install OBS Qt6 dependencies (Fedora)
         sudo dnf install -y qt6-qtbase-devel qt6-qtbase-private-devel \
           qt6-qtsvg-devel qt6-qtwayland-devel
 

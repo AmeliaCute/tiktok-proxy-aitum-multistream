@@ -76,7 +76,6 @@ runs:
       if: runner.os == 'Linux' && inputs.target != 'x86_64-fedora'
       shell: bash
       run: |
-        : Install Dependencies 🛍️
         echo ::group::Install Dependencies
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
@@ -103,7 +102,6 @@ runs:
       if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
       shell: bash
       run: |
-        : Install Dependencies (Fedora)
         sudo dnf install -y zsh rpm-build jq
 
     - name: Run Fedora Packaging
