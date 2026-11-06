@@ -241,8 +241,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Install Git 
-        run: dnf install -y git
+      - name: Install Git and jq
+        run: dnf install -y git jq
 
       - uses: actions/checkout@v4
         with:
@@ -286,14 +286,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-fedora-x86_64-${{ needs.check-event.outputs.commitHash }}
-          path: ${{ github.workspace }}/release/${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-x86_64*.rpm
+          path: |
+            ${{ github.workspace }}/release/*.rpm
+            !${{ github.workspace }}/release/*debuginfo*.rpm
 
       - name: Upload debug symbol artifacts
         uses: actions/upload-artifact@v4
         if: ${{ fromJSON(needs.check-event.outputs.package) }}
         with:
           name: ${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-fedora-x86_64-${{ needs.check-event.outputs.commitHash }}-debuginfo
-          path: ${{ github.workspace }}/release/${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-x86_64*-debuginfo.rpm
+          path: ${{ github.workspace }}/release/*debuginfo*.rpm
 
   windows-build:
     name: Build for Windows 🪟
