@@ -1,4 +1,4 @@
-autoload -Uz log_error log_status log_info mkcd
+autoload -Uz log_error log_status log_info log_debug mkcd
 
 if (( ! ${+project_root} )) {
   log_error "'project_root' not set. Please set before running ${0}."
@@ -8,6 +8,12 @@ if (( ! ${+project_root} )) {
 if (( ! ${+target} )) {
   log_error "'target' not set. Please set before running ${0}."
   return 2
+}
+
+if (( ! ${+commands[apt-get]} )) && (( ${+commands[dnf]} )) {
+  # Fedora/RHEL-like: obs-studio and Qt dev packages are installed via dnf by the CI action
+  log_debug 'apt-get not found, dnf available: skipping apt-based dependency setup.'
+  return 0
 }
 
 pushd ${project_root}

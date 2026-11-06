@@ -5,10 +5,10 @@ log_debug 'Checking Linux distribution name and version...'
 
 # Check for Ubuntu version 22.10 or later, which have srt and librist available via apt-get
 typeset -g -i UBUNTU_2210_OR_LATER=0
-if [[ -f /etc/os_release ]] {
+if [[ -f /etc/os-release ]] {
   local dist_name
   local dist_version
-  read -r dist_name dist_version <<< "$(source /etc/os_release; print "${NAME} ${VERSION_ID}")"
+  read -r dist_name dist_version <<< "$(source /etc/os-release; print "${NAME} ${VERSION_ID}")"
 
   autoload -Uz is-at-least
   if [[ ${dist_name} == Ubuntu ]] && is-at-least 22.10 ${dist_version}; then
@@ -18,7 +18,13 @@ if [[ -f /etc/os_release ]] {
 
 log_debug 'Checking for apt-get...'
 if (( ! ${+commands[apt-get]} )) {
-  log_error 'No apt-get command found. Please install apt'
+  if (( ${+commands[dnf]} )) {
+    # Fedora/RHEL-like: build dependencies are installed by the CI action via dnf
+    log_debug 'No apt-get found, but dnf is available. Skipping apt dependency check.'
+    log_group
+    return 0
+  }
+  log_error 'No apt-get or dnf command found. Please install apt or dnf'
   return 2
 } else {
   log_debug "Apt-get located at ${commands[apt-get]}"

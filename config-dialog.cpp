@@ -1232,6 +1232,10 @@ void OBSBasicSettings::AddProperty(obs_properties_t *properties, obs_property_t 
 				widget->setCurrentIndex(idx);
 		}
 
+		#if defined(__GNUC__) || defined(__clang__)
+			#pragma GCC diagnostic push
+			#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+		#endif
 		if (obs_data_has_autoselect_value(settings, name)) {
 			switch (format) {
 			case OBS_COMBO_FORMAT_INT:
@@ -1256,6 +1260,9 @@ void OBSBasicSettings::AddProperty(obs_properties_t *properties, obs_property_t 
 				widget->setItemText(idx, combined.arg(selected).arg(actual));
 			}
 		}
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 		auto label = new QLabel(QString::fromUtf8(obs_property_description(property)));
 		layout->addRow(label, widget);
 		if (!obs_property_visible(property)) {
