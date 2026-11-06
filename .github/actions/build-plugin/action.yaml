@@ -83,7 +83,12 @@ runs:
           pciutils-devel pipewire-devel uthash-devel
 
         sudo dnf install -y qt6-qtbase-devel qt6-qtbase-private-devel \
-          qt6-qtsvg-devel qt6-qtwayland-devel
+          qt6-qtsvg-devel qt6-qtwayland-devel obs-studio-devel
+
+        libobs_cfg="$(find /usr/lib64 /usr/lib -name libobsConfig.cmake -print -quit)"
+        test -n "${libobs_cfg}"
+        sudo mkdir -p /usr/local/lib/cmake/LibObs
+        echo "include(\"${libobs_cfg}\")" | sudo tee /usr/local/lib/cmake/LibObs/LibObsConfig.cmake
 
     - name: Run Fedora Build
       if: runner.os == 'Linux' && inputs.target == 'x86_64-fedora'
