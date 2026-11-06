@@ -96,8 +96,8 @@ TikTokSetupDialog::TikTokSetupDialog(const std::string &token, QWidget *parent) 
 			watcher->deleteLater();
 		});
 
-	auto token = m_token;
-	watcher->setFuture(QtConcurrent::run([token] { return TikTokStreamlabs::getAccountInfo(token); }));
+	auto tokenCopy = m_token;
+	watcher->setFuture(QtConcurrent::run([tokenCopy] { return TikTokStreamlabs::getAccountInfo(tokenCopy); }));
 }
 
 void TikTokSetupDialog::onCategoryTextChanged(const QString &text)
